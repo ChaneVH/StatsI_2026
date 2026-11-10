@@ -1,0 +1,256 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{graphicx,textcomp}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage[reqno]{amsmath}
+\usepackage{amsthm}
+\usepackage{fancyvrb}
+\usepackage{amssymb,enumerate}
+\usepackage[all]{xy}
+\usepackage{endnotes}
+\usepackage{lscape}
+\newtheorem{com}{Comment}
+\usepackage{float}
+\usepackage{hyperref}
+\newtheorem{lem}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{thm}{Theorem}
+\newtheorem{defn}{Definition}
+\newtheorem{cor}{Corollary}
+\newtheorem{obs}{Observation}
+\usepackage[compact]{titlesec}
+\usepackage{dcolumn}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{multirow}
+\usepackage{xcolor}
+\newcolumntype{.}{D{.}{.}{-1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\definecolor{light-gray}{gray}{0.65}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},    
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+\lstset{style=mystyle}
+\newcommand{\Sref}[1]{Section~\ref{#1}}
+\newtheorem{hyp}{Hypothesis}
+
+\title{Problem Set 3}
+\date{Due: November 12, 2026}
+\author{Applied Stats/Quant Methods 1}
+
+\begin{document}
+	\maketitle
+	\section*{Instructions}
+	\begin{itemize}
+		\item Please show your work! You may lose points by simply writing in the answer. If the problem requires you to execute commands in \texttt{R}, please include the code you used to get your answers. Please also include the \texttt{.R} file that contains your code. If you are not sure if work needs to be shown for a particular problem, please ask.
+		\item Your homework should be submitted electronically on GitHub.
+		\item This problem set is due before 23:59 on Thursday November 12, 2026. No late assignments will be accepted.
+	\end{itemize}
+	
+	\vspace{.25cm}
+	
+	\noindent In this problem set, you will run several regressions and create an added variable plot in \texttt{R} using the \texttt{incumbents\_subset.csv} dataset. Include all of your code.
+	
+	\vspace{.5cm}
+	\section*{Question 1}
+	\vspace{.25cm}
+	\noindent We are interested in knowing how the difference in campaign spending between incumbent and challenger affects the incumbent's vote share. 
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{voteshare} and the explanatory variable is \texttt{difflog}.	
+		
+		\lstinputlisting[language=R, firstline=51, lastline=55]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+		\textbf{Interpretation:} 
+		The intercept is $0.579031$ (predicted incumbent vote share when spending difference is zero is approx. $57.90\%$). The coefficient for difflog is $0.041666$, indicating that a one-unit increase in the spending difference is associated with an increase of approximately $4.17$ percentage points in the incumbent vote share. The $p$-value ($<2.2\text{e}-16$) indicates statistical significance, and $R^2 \approx 0.3673$. My model explains $36\%$ of the variation in vote share (voteshare) across the observations.
+			\vspace{.5cm}
+		\item Make a scatterplot of the two variables and add the regression line. 
+		
+		\lstinputlisting[language=R, firstline=64, lastline=80]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=0.8\textwidth]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/Graphs/Graph 1.png}
+			\label{fig:graph1}
+		\end{figure}
+		
+			\textbf{Interpretation:} 
+		There is a positive association in this linear relationship between the two variables. As the campaign spending increases so does incumbent vote share. 
+			\vspace{.5cm}
+		\item Save the residuals of the model in a separate object.	
+		
+		\lstinputlisting[language=R, firstline=86, lastline=87]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+			\vspace{.5cm}
+		\item Write the prediction equation.
+		
+		\textbf{Prediction Equation:}
+		$$\widehat{\text{voteshare}} = 0.579031 + 0.041666 \times \text{difflog}$$
+		
+		\lstinputlisting[language=R, firstline=91, lastline=93]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+	
+				\textbf{Interpretation:} 	
+		When the difference in log campaign spending is zero ($\text{difflog} = 0$), the model predicts an incumbent vote share of $0.579$, or about $57.9\%$. For every one-unit increase in the difference in log campaign spending ($\text{difflog}$), the incumbent's predicted vote share increases by $0.041666$ (or approximately $4.17$ percentage points).
+	\end{enumerate}
+	
+	\newpage
+	
+	\section*{Question 2}
+	\noindent We are interested in knowing how the difference between incumbent and challenger's spending and the vote share of the presidential candidate of the incumbent's party are related.	\vspace{.25cm}
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{presvote} and the explanatory variable is \texttt{difflog}.	
+		
+		
+		\lstinputlisting[language=R, firstline=103, lastline=107]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+		\textbf{Interpretation:} 
+		The intercept is $0.507583$ (predicted incumbent vote share when spending difference is zero is approx. $50.76\%$). The coefficient for difflog is $0.023837$, indicating that a one-unit increase in the spending difference is associated with an increase of approximately $2.38$ percentage points in the incumbent vote share. The $p$-value ($<2\text{e}-16$) indicates statistical significance, and $R^2 \approx 0.0880$. My model explains $8.8\%$ of the variation in vote share (presvote) across the observations.
+			\newpage
+		\item Make a scatterplot of the two variables and add the regression line. 
+		
+		\lstinputlisting[language=R, firstline=117, lastline=133]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+			\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=0.8\textwidth]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/Graphs/Graph 2.png}
+			\label{fig:graph2}
+		\end{figure}
+		
+					\textbf{Interpretation:} 
+		There is a positive association in this linear relationship between the two variables. As the campaign spending increases so does the presidential vote share.
+			\vspace{.5cm}
+			
+		\item Save the residuals of the model in a separate object.	
+		
+		
+		\lstinputlisting[language=R, firstline=139, lastline=139]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+			\vspace{.5cm}
+		\item Write the prediction equation.
+		
+		\textbf{Prediction Equation:}
+		$$\widehat{\text{presvote}} = 0.50758 + 0.02384 \times \text{difflog}$$
+		
+		\lstinputlisting[language=R, firstline=144, lastline=145]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+		\textbf{Interpretation:} 	
+		When the difference in log campaign spending is zero ($\text{difflog} = 0$), the model predicts a presidential vote share of $0.508$, or about $50.76\%$. For every one-unit increase in the difference in log campaign spending ($\text{difflog}$), the incumbent's predicted presidential vote share increases by $0.0238$ (or approximately $2.38$ percentage points). 
+	\end{enumerate}
+	
+	\newpage	
+	\section*{Question 3}
+	
+	\noindent We are interested in knowing how the vote share of the presidential candidate of the incumbent's party is associated with the incumbent's electoral success.
+	\vspace{.25cm}
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{voteshare} and the explanatory variable is \texttt{presvote}.
+		
+		\lstinputlisting[language=R, firstline=156, lastline=160]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+		\textbf{Interpretation:} 
+		The intercept is $0.441330$ (predicted incumbent vote share when presidential vote share is zero is approx. $44.13\%$). The coefficient for presvote is $0.388018$, indicating that a one-unit increase in presidential vote share is associated with an increase of approximately $38.80$ percentage points in the incumbent vote share. The $p$-value ($<2\text{e}-16$) indicates statistical significance, and $R^2 \approx 0.2058$. My model explains $20.58\%$ of the variation in vote share (voteshare) across the observations.
+			\vspace{.5cm}
+		\item Make a scatterplot of the two variables and add the regression line. 
+		
+		
+		\lstinputlisting[language=R, firstline=170, lastline=188]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+					\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=0.8\textwidth]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/Graphs/Graph 3.png}
+			\label{fig:graph3}
+		\end{figure}
+		\textbf{Interpretation:} 
+		There is a positive association in this linear relationship between the two variables. As the presidential vote share increases so does the incumbent vote share.
+\newpage
+		\item Write the prediction equation.
+		
+		\textbf{Prediction Equation:}
+		$$\widehat{\text{voteshare}} = 0.441330 + 0.388018 \times \text{presvote}$$
+		
+		\lstinputlisting[language=R, firstline=193, lastline=194]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		\textbf{Interpretation:}
+		When the presidential vote share is zero ($\text{presvote} = 0$), the model predicts an incumbent vote share of $0.441$, or about $44.13\%$. For every one-unit increase in the presidential vote share ($\text{presvote}$), the incumbent's predicted vote share increases by $0.3880$ (or approximately $38.80$ percentage points).
+	\end{enumerate}
+	
+	\newpage	
+	\section*{Question 4}
+	\noindent The residuals from part (a) tell us how much of the variation in \texttt{voteshare} is \emph{not} explained by the difference in spending between incumbent and challenger. The residuals in part (b) tell us how much of the variation in \texttt{presvote} is \emph{not} explained by the difference in spending between incumbent and challenger in the district.
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is the residuals from Question 1 and the explanatory variable is the residuals from Question 2.	
+		
+		\lstinputlisting[language=R, firstline=204, lastline=207]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+			\textbf{Interpretation:} 
+			The intercept is $-5.934\text{e}-18$ (predicted residual incumbent vote share when residual presidential vote share is zero is approx. $0.00\%$). The coefficient for residual\_model\_presvote is $0.2569$, indicating that a one-unit increase in the residual presidential vote share is associated with an increase of approximately $25.69$ percentage points in the residual incumbent vote share. The $p$-value ($<2\text{e}-16$) indicates statistical significance, and $R^2 \approx 0.1300$. My model explains $13.00\%$ of the variation in residual vote share across the observations.
+		
+			\vspace{.5cm}
+		\item Make a scatterplot of the two residuals and add the regression line. 
+		
+		\lstinputlisting[language=R, firstline=217, lastline=237]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+							\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=0.8\textwidth]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/Graphs/Graph 4.png}
+			\label{fig:graph4}
+		\end{figure}
+		\textbf{Interpretation:} 
+		There is a positive association in this linear relationship between the two variables. As the presidential vote share increases so does the incumbent vote share.
+	\newpage
+		\item Write the prediction equation.
+		
+		\textbf{Prediction Equation:}
+		$$\widehat{\text{res\_voteshare}} = -5.934\text{e}-18 + 0.256877 \times \text{res\_presvote}$$
+		
+		\lstinputlisting[language=R, firstline=241, lastline=242]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+			\textbf{Interpretation:} 
+	When the residual presidential vote share is zero ($\text{residual\_model\_presvote} = 0$), the model predicts a residual incumbent vote share of $-5.934\text{e}-18$, or about $0.00\%$. For every one-unit increase in the residual presidential vote share ($\text{residual\_model\_presvote}$), the incumbent's predicted residual vote share increases by $0.2569$ (or approximately $25.69$ percentage points).
+	\end{enumerate}
+	
+	\newpage	
+	
+	\section*{Question 5}
+	\noindent What if the incumbent's vote share is affected by both the president's popularity and the difference in spending between incumbent and challenger? 
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is the incumbent's \texttt{voteshare} and the explanatory variables are \texttt{difflog} and \texttt{presvote}.	
+		
+		\lstinputlisting[language=R, firstline=249, lastline=252]{C:/Users/chane/Desktop/StatsI_2026/problem_sets/PS03/my_answers/PS03_answersCVH.R}
+		
+		\textbf{Interpretation:} 
+		The intercept is $0.4486$ (predicted incumbent vote share when both the spending difference and presidential vote share are zero is approx. $44.86\%$). The $p$-values ($<2\text{e}-16$) indicate statistical significance, and $R^2 \approx 0.4496$. The model explains approximately $44.96\%$ of the variation in incumbent vote share across the observations.
+					\vspace{.5cm}
+		\item Write the prediction equation.	
+		
+		\textbf{Prediction Equation:}
+		$$\widehat{\text{voteshare}} = 0.4486442 + 0.0355431 \times \text{difflog} + 0.2568770 \times \text{presvote}$$
+		\textbf{Interpretation:} 
+		The coefficient for $\text{difflog}$ is $0.0355$, indicating that a one-unit increase in the spending difference is associated with an increase of approximately $3.55$ percentage points in the incumbent vote share, holding presidential vote share constant. The coefficient for $\text{presvote}$ is $0.2569$, indicating that a one-unit increase in presidential vote share is associated with an increase of approximately $25.69$ percentage points in the incumbent vote share, holding spending difference constant. 
+					\vspace{.5cm}
+		\item What is it in this output that is identical to the output in Question 4? Why do you think this is the case?
+		
+		\textbf
+		The coefficient for \texttt{presvote} ($0.2569$) in Question 5 is identical to the coefficient of the residual regression in Question 4. This is a direct consequence of the \textbf{Frisch--Waugh--Lovell theorem} and the concept of statistical control. By removing the effect of difflog (the difference in spending between incumbent and challenger) from both incumbent vote share and presidential vote share, we effectively control for the influence of spending. The R-squared value and the coefficient for difflog are different.
+	\end{enumerate}
+	
+\end{document}

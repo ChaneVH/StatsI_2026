@@ -1,0 +1,310 @@
+
+```{r}
+#####################
+# load libraries
+# set wd
+# clear global .envir
+#####################
+
+# remove objects
+rm(list=ls())
+# detach all libraries
+detachAllPackages <- function() {
+  basic.packages <- c("package:stats", "package:graphics", "package:grDevices", "package:utils", "package:datasets", "package:methods", "package:base")
+  package.list <- search()[ifelse(unlist(gregexpr("package:", search()))==1, TRUE, FALSE)]
+  package.list <- setdiff(package.list, basic.packages)
+  if (length(package.list)>0)  for (package in package.list) detach(package,  character.only=TRUE)
+}
+detachAllPackages()
+
+# load libraries
+pkgTest <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[,  "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg,  dependencies = TRUE)
+  sapply(pkg,  require,  character.only = TRUE)
+}
+# Install ggplot2 if you haven't already
+install.packages("ggplot2")
+
+# Load package
+library(ggplot2)
+
+# here is where you load any necessary packages
+# ex: stringr
+# lapply(c("stringr"),  pkgTest)
+
+# set wd for current folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+# read in data
+inc.sub <- read.csv("https://raw.githubusercontent.com/ASDS-TCD/StatsI_2026/main/datasets/incumbents_subset.csv")
+
+# Summary statistics
+summary(inc.sub)
+
+
+# Does spending more money than the challenger help an incumbent win a larger share of the votes.
+# Outcome variable - vote share
+# Predictor variable - difflog
+
+# 1.1.
+# Run regression
+model_voteshare <- lm(voteshare ~ difflog, data = inc.sub)
+model_voteshare
+
+# Display regression results
+summary(model_voteshare)
+# Intercept 0.579031 - the predicted incumbent vote share is approximately 57.90%.
+# diff-log 0.041666 - campaign spending increases, the incumbent vote share also tends to increase, 1 unit increase is associated with 4.17 percentage points in vote shares.
+# p-value is 2.2e-16 (less than 0.001) thus we reject the null hypothesis that the difflog coefficient is zero.
+# r-squared is 0.3673, thus approximately 36.73% of the variation in incumbent vote share is explained by the difference in campaign spending in this regression.
+# Positive and statistically significant relationship between two variables.
+
+## 1.2.
+# Scatterplot
+ggplot(inc.sub, aes(x = difflog, y = voteshare)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Relationship between Campaign Spending Difference and Incumbent Vote Share",
+    x = "Difference in Log Campaign Spending",
+    y = "Incumbent Vote Share (voteshare)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+## 1.3.
+# Save the residuals of the model in a separate object.
+residual_model_voteshare <- residuals(model_voteshare)
+head(residual_model_voteshare)
+
+## 1.4.
+# Write the prediction equation.
+# Predicted incumbent voter-share = 0.579031 + 0.041666 (difflog)
+coef(model_voteshare)
+
+
+### Question 2
+
+# Does spending more money than the challenger help an incumbent win a larger share of the votes.
+# Outcome variable - pres vote
+# Predictor variable - difflog
+
+## 2.1.
+# Run regression
+model_presvote <- lm(presvote ~ difflog, data = inc.sub)
+model_presvote
+
+# Display regression results
+summary(model_presvote)
+# Intercept 0.50758 - the presidential candidate of the incumbent's party share is approximately 50.76%.
+# diff-log 0.02384 - campaign spending increases, the presidential candidate of the incumbent's party also tends to increase, 1 unit increase is associated with 2.38 percentage points in presidential vote share.
+# p-value is 2.2e-16 (less than 0.001) thus we reject the null hypothesis that the difflog coefficient is zero.
+# r-squared is 0.08795, thus approximately 8.80% of the variation in the presidential candidate of the incumbent's party is explained by the difference in campaign spending in this regression.
+# Positive and statistically significant relationship between two variables.
+
+
+## 2.2.
+# Scatterplot
+ggplot(inc.sub, aes(x = difflog, y = presvote)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Relationship between Campaign Spending Difference and Presidential Vote Share",
+    x = "Difference in Log Campaign Spending",
+    y = "Presidential Vote Share (presvote)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+## 2.3.
+# Save the residuals of the model in a separate object.
+residual_model_presvote <- residuals(model_presvote)
+head(model_presvote)
+
+## 2.4.
+# Write the prediction equation.
+# Presidential candidate of the incumbent's party = 00.50758333 + 0.02383723 (difflog)
+coef(model_presvote)
+
+
+### Question 3
+
+# Whether the vote share of the presidential candidate from the incumbent's party (presvote) is associated with the incumbent's own electoral success (voteshare).
+# Outcome variable - vote share
+# Predictor variable - pres vote
+
+## 3.1.
+# Run regression
+model_voterpres <- lm(voteshare ~ presvote, data = inc.sub)
+model_voterpres
+
+# Display regression results
+summary(model_voterpres)
+# Intercept 0.441330 - the presidential candidate of the incumbent's party share is approximately 44.13%.
+# diff-log 0.388018 - campaign spending increases, the presidential candidate of the incumbent's party also tends to increase, 1 unit increase is associated with 38.80 percentage points in presidential vote share.
+# p-value is 2.2e-16 (less than 0.001) thus we reject the null hypothesis that the pres vote coefficient is zero.
+# r-squared is 0.2058, thus  approximately 20.58% of the variation in the incumbent's vote share is explained by the presidential vote share of the incumbent's party. 
+# Positive and statistically significant relationship between two variables.
+
+
+## 3.2.
+# Scatterplot
+ggplot(inc.sub, aes(x = difflog, y = presvote)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Relationship Between Presidential Vote Share and Incumbent Electoral Success",
+    x = "Presidential Vote Share (presvote)",
+    y = "Incumbent Vote Share (voteshare)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+
+## 3.3.
+# Write the prediction equation.
+# Presidential vote share and incumbent electoral success = 0.4413299 + 0.3880184(difflog)
+coef(model_voterpres)
+
+### Question 4
+
+# Whether the vote share of the presidential candidate from the incumbent's party (presvote) is associated with the incumbent's own electoral success (voteshare).
+# Outcome variable - vote share
+# Predictor variable - pres vote
+
+## 4.1.
+# Run regression
+model_residuals <- lm(residual_model_voteshare ~ residual_model_presvote)
+
+# Display regression results
+summary(model_residuals)
+# Intercept -5.934e-18 - intercept is very close to zero.
+# residual_model_presvote  0.2569 - a one-unit increase in the presidential vote share residual is associated with a 0.2569 increase in the incumbent vote share residual.
+# p-value is 2.2e-16 (less than 0.001) thus we reject the null hypothesis that the pres vote coefficient is zero.
+# r-squared is 0.13, thus  approximately 13% of the variation in the incumbent vote share residuals is explained by the presidential vote share residuals.
+# Campaign spending differences do not explain the entire relationship between presidential vote share and incumbent electoral success. Even after removing the variation associated with spending, a positive relationship remains.
+
+
+## 4.2.
+# Scatterplot
+ggplot(inc.sub, aes(x = residual_model_presvote,
+                    y = residual_model_voteshare)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Relationship Between Presidential and Incumbent Vote Share Residuals",
+    x = "Presidential Vote Share Residuals",
+    y = "Incumbent Vote Share Residuals",
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+
+## 4.3.
+# Write the prediction equation.
+# Residual model voteshare = -5.934078e-18 + 0.2568770(residual_model_presvote)
+coef(model_residuals)
+
+
+### Question 5
+
+## 5.1.
+# Multiple linear regression
+model_multiple <- lm(voteshare ~ difflog + presvote, data = inc.sub)
+
+# Display regression results
+summary(model_multiple)
+# Intercept 0.4486442 - when both explanatory variables are zero, the predicted incumbent vote share is approximately 44.86%.
+# difflog     0.0355431 - if presvote is constant, a one-unit increase in the difference in log campaign spending is associated with an increase of approximately 3.55 percentage points in the incumbent's vote share.
+# presvote    0.2568770 - if campaign spending differences is constant, a one-unit increase in presidential vote share is associated with an increase of approximately 25.69 percentage points in the incumbent's vote share.
+# p-value is 2.2e-16 (less than 0.001) thus both variables have statistically significant relationships with incumbent vote share, even when controlling for the other variable.
+# r-squared is 0.4496, thus  approximately 44.96% of the variation in incumbent vote share is explained jointly by campaign spending differences and presidential vote share.
+# The results suggest that both campaign spending differences and presidential popularity are important factors associated with incumbent electoral success.
+
+## 5.2.
+# Scatterplot
+ggplot(inc.sub, aes(x = difflog, y = voteshare)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Campaign Spending Difference and Incumbent Vote Share",
+    x = "Difference in Log Campaign Spending (difflog)",
+    y = "Incumbent Vote Share (voteshare)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+
+ggplot(inc.sub, aes(x = presvote, y = voteshare)) +
+  geom_point(color = "#2878B5", alpha = 0.35, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE,
+              color = "#D9534F", fill = "#F4B6B2",
+              linewidth = 1.2) +
+  labs(
+    title = "Presidential Vote Share and Incumbent Electoral Success",
+    x = "Presidential Vote Share (presvote)",
+    y = "Incumbent Vote Share (voteshare)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10, color = "grey40"),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color = "grey50"),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+## 5.3.
+# What is it in this output that is identical to the output in Question 4? Why do you think this is the case?
+# The coefficient for presvote, including its standard error, t-value and p-value, is identical in Questions 4 and 5. 
+#  It is a mathematical property of multiple regression (Frisch–Waugh–Lovell theorem).
+```
+
